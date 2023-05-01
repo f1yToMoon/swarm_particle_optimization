@@ -4,12 +4,8 @@
 #include <QPushButton>
 #include <QSpinBox>
 #include <qlabel.h>
-
-#include <QLogValueAxis>
-#include <QLineSeries>
-#include <QValueAxis>
-#include <QChart>
-#include <QChartView>
+#include <QTimer>
+#include <QGraphicsView>
 
 #include <iostream>
 #include <vector>
@@ -17,7 +13,6 @@
 #include <algorithm>
 
 using namespace std;
-using namespace QtCharts;
 
 namespace Ui {
     class MainWindow;
@@ -41,19 +36,20 @@ private slots:
     void on_spinBox_5_valueChanged(int arg4);
 
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow *ui;    
 
     QPushButton pushButton;
     QSpinBox spinBox, spinBox_2, spinBox_5;
-    QLabel label_5;
+    QLabel label_5, label;
 
     int particles = 0, k = 0;
     float w = 0.729, c1 = 1.49445, c2 = 1.49445;
     int t_left = 0, t_right = 0;
     QList<QString> fun, x1, x2, id;
+    vector<int> duration;
+    vector<int> x_step = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    vector<int> y_step = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-    QTimer *_timer;
-    int     _x = 0;
 };
 
 #endif // MAINWINDOW_H
