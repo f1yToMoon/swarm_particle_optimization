@@ -5,6 +5,9 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "matplotlibcpp.h"
+
+namespace plt = matplotlibcpp;
 
 float f(float x1, float x2) {
     float res = 4 * pow(x1 - 5, 2) + pow(x2 - 6, 2);
@@ -40,8 +43,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-
+    duration.clear();
     k = 0;
+    vector<float> x, y;
+    vector<pair<vector<float>, vector<float>>> vizualize;
 
     pair<float, float> globalBestPos;
     vector<pair<pair<pair<float, float>, pair<float, float>>, pair<float, pair<float, float>>>> init;
@@ -66,7 +71,7 @@ void MainWindow::on_pushButton_clicked()
 
     while (f(globalBestPos.first, globalBestPos.second) != 0) {
 
-        k++;
+        k++; x.clear(); y.clear();
 
         for (int j = 0; j < particles; ++j) {
             float r = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (1)));
@@ -97,9 +102,44 @@ void MainWindow::on_pushButton_clicked()
 
         globalBestPos = make_pair(init[0].second.second.first, init[0].second.second.second);
 
+
+        for (int j = 0; j < particles; ++j) {
+            x.push_back(init[j].first.first.first);
+            y.push_back(init[j].first.first.second);
+        }
+        vizualize.push_back(make_pair(x, y));
+
+    }
+
+    int timeCount = vizualize.size();
+    for (int i = 0 ; i < timeCount; ++i) {
+        duration.push_back(i*1000);
+    }
+
+    for (int i = 0; i < timeCount; ++i) {
+        QTimer * timer = new QTimer(this);
+        timer->setSingleShot(true);
+        connect(timer, &QTimer::timeout, [=](){
+            plt::scatter(vizualize[i].first, vizualize[i].second);
+            string s = "/home/nick/1.png";
+            plt::xlabel("x1");
+            plt::ylabel("x2");
+            plt::xticks(x_step);
+            plt::yticks(y_step);
+            plt::title(to_string(i + 1));
+            plt::save(s);
+            ui->label->setPixmap(QPixmap::fromImage(QImage(QString::fromStdString(s))));
+            plt::cla();
+        timer->deleteLater();
+        });
+
+        timer->start(duration[i]);
+
     }
 
     ui->label_5->setText(QString(QString::fromStdString("Количество итераций: " + to_string(k))));
+
+
 }
 
 void MainWindow::on_spinBox_valueChanged(int arg1)
